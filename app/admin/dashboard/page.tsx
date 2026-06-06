@@ -33,7 +33,7 @@ export default function AdminDashboard() {
   const [authorized, setAuthorized] = useState(false)
   const [products, setProducts] = useState<MockProduct[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'products' | 'collections' | 'orders' | 'settings'>('products')
+  const [activeTab, setActiveTab] = useState<'products' | 'collections' | 'orders' | 'settings' | 'content'>('products')
   const router = useRouter()
 
   // Collections state
@@ -66,6 +66,8 @@ export default function AdminDashboard() {
   const [newAutoMinItems, setNewAutoMinItems] = useState('')
   const [newAutoValue, setNewAutoValue] = useState('')
   const [newAutoType, setNewAutoType] = useState<'fixed'|'percentage'>('fixed')
+
+  const [uiContent, setUiContent] = useState(DEFAULT_SETTINGS.uiContent)
 
   // Form State
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -119,6 +121,7 @@ export default function AdminDashboard() {
         setFreeShippingThreshold(s.freeShippingThreshold)
         setPromoCodes(s.promoCodes)
         setAutoDiscounts(s.autoDiscounts)
+        setUiContent(s.uiContent)
       })
 
       // Load theme
@@ -408,6 +411,7 @@ export default function AdminDashboard() {
       freeShippingThreshold,
       promoCodes,
       autoDiscounts,
+      uiContent,
     }
     saveSettings(updated).then(() => {
       setSettings(updated)
@@ -533,6 +537,14 @@ export default function AdminDashboard() {
             }`}
           >
             ⚙ الإعدادات / Settings
+          </button>
+          <button
+            onClick={() => setActiveTab('content')}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+              activeTab === 'content' ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            محتوى الموقع / UI Content
           </button>
         </div>
 
@@ -931,6 +943,235 @@ export default function AdminDashboard() {
               </div>
             </div>
           </>
+        )}
+
+        {/* ── Content Tab ── */}
+        {activeTab === 'content' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-black text-foreground tracking-tight">محتوى الموقع / Website Content</h1>
+                <p className="text-muted-foreground text-sm mt-1">Edit the text and labels shown on the website</p>
+              </div>
+              <button
+                onClick={handleSaveSettings}
+                className="bg-foreground text-background px-6 py-2.5 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity cursor-pointer shadow-xl flex items-center gap-2"
+              >
+                {settingsSaved ? (
+                  <>✓ تم الحفظ / Saved</>
+                ) : (
+                  <>حفظ المحتوى / Save Content</>
+                )}
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Marquee & Hero */}
+              <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
+                <h2 className="text-base font-bold text-foreground">الشريط المتحرك والواجهة / Marquee & Hero</h2>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Marquee Text (Comma separated)</label>
+                    <textarea
+                      value={uiContent.marqueeText}
+                      onChange={(e) => setUiContent({ ...uiContent, marqueeText: e.target.value })}
+                      className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Hero Badge (e.g. SS'26 Collection)</label>
+                    <input
+                      type="text"
+                      value={uiContent.heroBadge}
+                      onChange={(e) => setUiContent({ ...uiContent, heroBadge: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Hero Title (Use \n for new line)</label>
+                    <textarea
+                      value={uiContent.heroTitle}
+                      onChange={(e) => setUiContent({ ...uiContent, heroTitle: e.target.value })}
+                      className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-20 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Hero Description</label>
+                    <textarea
+                      value={uiContent.heroDescription}
+                      onChange={(e) => setUiContent({ ...uiContent, heroDescription: e.target.value })}
+                      className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Hero Button Text</label>
+                    <input
+                      type="text"
+                      value={uiContent.heroButtonText}
+                      onChange={(e) => setUiContent({ ...uiContent, heroButtonText: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Collections & Footer */}
+              <div className="space-y-6">
+                <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
+                  <h2 className="text-base font-bold text-foreground">قسم المجموعات والتصنيفات / Collections & Categories</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Trending Subtitle</label>
+                      <input
+                        type="text"
+                        value={uiContent.collectionsSubtitle}
+                        onChange={(e) => setUiContent({ ...uiContent, collectionsSubtitle: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Trending Title</label>
+                      <input
+                        type="text"
+                        value={uiContent.collectionsTitle}
+                        onChange={(e) => setUiContent({ ...uiContent, collectionsTitle: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Categories Subtitle</label>
+                      <input
+                        type="text"
+                        value={uiContent.categoriesSubtitle}
+                        onChange={(e) => setUiContent({ ...uiContent, categoriesSubtitle: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Categories Title</label>
+                      <input
+                        type="text"
+                        value={uiContent.categoriesTitle}
+                        onChange={(e) => setUiContent({ ...uiContent, categoriesTitle: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
+                  <h2 className="text-base font-bold text-foreground">شريط المميزات / Features Banner</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Background Text (e.g. QUALITY)</label>
+                      <input
+                        type="text"
+                        value={uiContent.featuresBgText}
+                        onChange={(e) => setUiContent({ ...uiContent, featuresBgText: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                    {uiContent.features.map((feature, idx) => (
+                      <div key={idx} className="p-4 border border-border rounded-xl space-y-3 bg-background/50">
+                        <p className="text-xs font-bold text-foreground">Feature {idx + 1}</p>
+                        <input
+                          type="text"
+                          placeholder="Stat (e.g. 100%)"
+                          value={feature.stat}
+                          onChange={(e) => {
+                            const newFeatures = [...uiContent.features]
+                            newFeatures[idx].stat = e.target.value
+                            setUiContent({ ...uiContent, features: newFeatures })
+                          }}
+                          className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Label (e.g. Premium Cotton)"
+                          value={feature.label}
+                          onChange={(e) => {
+                            const newFeatures = [...uiContent.features]
+                            newFeatures[idx].label = e.target.value
+                            setUiContent({ ...uiContent, features: newFeatures })
+                          }}
+                          className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Subtitle (e.g. Sourced from trusted suppliers)"
+                          value={feature.sub}
+                          onChange={(e) => {
+                            const newFeatures = [...uiContent.features]
+                            newFeatures[idx].sub = e.target.value
+                            setUiContent({ ...uiContent, features: newFeatures })
+                          }}
+                          className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
+                  <h2 className="text-base font-bold text-foreground">تذييل الموقع / Footer</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Footer Description</label>
+                      <textarea
+                        value={uiContent.footerDescription}
+                        onChange={(e) => setUiContent({ ...uiContent, footerDescription: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                      />
+                    </div>
+                    {uiContent.footerColumns?.map((col, colIdx) => (
+                      <div key={colIdx} className="p-4 border border-border rounded-xl space-y-3 bg-background/50">
+                        <input
+                          type="text"
+                          placeholder="Column Title (e.g. Shop)"
+                          value={col.title}
+                          onChange={(e) => {
+                            const newCols = [...uiContent.footerColumns]
+                            newCols[colIdx].title = e.target.value
+                            setUiContent({ ...uiContent, footerColumns: newCols })
+                          }}
+                          className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm font-bold"
+                        />
+                        <div className="space-y-2 mt-2">
+                          {col.links.map((link, linkIdx) => (
+                            <div key={linkIdx} className="flex gap-2">
+                              <input
+                                type="text"
+                                placeholder="Link Label"
+                                value={link.label}
+                                onChange={(e) => {
+                                  const newCols = [...uiContent.footerColumns]
+                                  newCols[colIdx].links[linkIdx].label = e.target.value
+                                  setUiContent({ ...uiContent, footerColumns: newCols })
+                                }}
+                                className="w-1/2 px-3 py-1.5 bg-background border border-border rounded-lg text-xs"
+                              />
+                              <input
+                                type="text"
+                                placeholder="URL (e.g. / or https://...)"
+                                value={link.url}
+                                onChange={(e) => {
+                                  const newCols = [...uiContent.footerColumns]
+                                  newCols[colIdx].links[linkIdx].url = e.target.value
+                                  setUiContent({ ...uiContent, footerColumns: newCols })
+                                }}
+                                className="w-1/2 px-3 py-1.5 bg-background border border-border rounded-lg text-xs"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </main>
 

@@ -7,7 +7,13 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 export const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey
 
 export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        fetch: (url, options) => {
+          return fetch(url, { ...options, cache: 'no-store' })
+        }
+      }
+    })
   : null
 
 // Helper to load products from localStorage for offline/local mode
@@ -394,6 +400,21 @@ export interface StoreSettings {
   freeShippingThreshold: number  // order value above which shipping is free
   promoCodes: { code: string; discount: number }[]  // discount in %
   autoDiscounts: { name: string; minItems: number; discountValue: number; type: 'fixed' | 'percentage' }[]
+  uiContent: {
+    marqueeText: string
+    heroBadge: string
+    heroTitle: string
+    heroDescription: string
+    heroButtonText: string
+    collectionsTitle: string
+    collectionsSubtitle: string
+    footerDescription: string
+    featuresBgText: string
+    features: { stat: string; label: string; sub: string }[]
+    categoriesTitle: string
+    categoriesSubtitle: string
+    footerColumns: { title: string; links: { label: string; url: string }[] }[]
+  }
 }
 
 const SETTINGS_KEY = 'nexstiv-settings'
@@ -404,6 +425,50 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   freeShippingThreshold: 100,
   promoCodes: [{ code: 'SAVE10', discount: 10 }],
   autoDiscounts: [],
+  uiContent: {
+    marqueeText: 'PREMIUM QUALITY, FREE SHIPPING OVER 500 MAD, NEW ARRIVALS, 30-DAY RETURNS, NEXSTIV ORIGINALS, CRAFTED WITH CARE',
+    heroBadge: 'SS\'26 Collection',
+    heroTitle: 'Wear the\nDifference.',
+    heroDescription: 'Premium quality t-shirts engineered for those who refuse to blend in. Every stitch, intentional.',
+    heroButtonText: 'Shop Collection',
+    collectionsTitle: 'Trending Now',
+    collectionsSubtitle: 'The Collection',
+    footerDescription: 'Premium t-shirts for the modern lifestyle',
+    featuresBgText: 'QUALITY',
+    features: [
+      { stat: '100%', label: 'Premium Cotton', sub: 'Sourced from trusted suppliers' },
+      { stat: '500+', label: 'Free Shipping', sub: 'On every qualifying order' },
+      { stat: '30', label: 'Day Returns', sub: 'No questions asked' },
+    ],
+    categoriesTitle: 'Collections',
+    categoriesSubtitle: 'Browse by Category',
+    footerColumns: [
+      {
+        title: 'Shop',
+        links: [
+          { label: 'All Products', url: '/' },
+          { label: 'New Arrivals', url: '/' },
+          { label: 'Best Sellers', url: '/' },
+        ]
+      },
+      {
+        title: 'Company',
+        links: [
+          { label: 'About', url: '#' },
+          { label: 'Contact', url: '#' },
+          { label: 'Careers', url: '#' },
+        ]
+      },
+      {
+        title: 'Support',
+        links: [
+          { label: 'FAQ', url: '#' },
+          { label: 'Shipping', url: '#' },
+          { label: 'Returns', url: '#' },
+        ]
+      }
+    ],
+  }
 }
 
 export async function loadSettings(): Promise<StoreSettings> {
@@ -422,6 +487,7 @@ export async function loadSettings(): Promise<StoreSettings> {
           freeShippingThreshold: data.free_shipping_threshold ?? DEFAULT_SETTINGS.freeShippingThreshold,
           promoCodes: data.promo_codes || DEFAULT_SETTINGS.promoCodes,
           autoDiscounts: data.auto_discounts || DEFAULT_SETTINGS.autoDiscounts,
+          uiContent: { ...DEFAULT_SETTINGS.uiContent, ...(data.ui_content || {}) },
         }
       }
     } catch (e) {
@@ -432,7 +498,15 @@ export async function loadSettings(): Promise<StoreSettings> {
   if (typeof window === 'undefined') return DEFAULT_SETTINGS
   try {
     const raw = localStorage.getItem(SETTINGS_KEY)
-    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      return { 
+        ...DEFAULT_SETTINGS, 
+        ...parsed,
+        uiContent: { ...DEFAULT_SETTINGS.uiContent, ...(parsed.uiContent || {}) }
+      }
+    }
+    return DEFAULT_SETTINGS
   } catch {
     return DEFAULT_SETTINGS
   }
@@ -450,6 +524,7 @@ export async function saveSettings(settings: StoreSettings): Promise<void> {
           free_shipping_threshold: settings.freeShippingThreshold,
           promo_codes: settings.promoCodes,
           auto_discounts: settings.autoDiscounts,
+          ui_content: settings.uiContent,
           updated_at: new Date().toISOString()
         })
       if (error) console.error('Supabase settings save error:', error)

@@ -7,7 +7,7 @@ import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { useCart } from '@/lib/cart-context'
-import { fetchAllProducts, fetchAllCollections } from '@/lib/db'
+import { fetchAllProducts, fetchAllCollections, loadSettings, DEFAULT_SETTINGS } from '@/lib/db'
 
 interface Product {
   id: string
@@ -26,17 +26,8 @@ interface Product {
   }
 }
 
-/* ── Marquee ticker ── */
-const TICKER_ITEMS = [
-  'PREMIUM QUALITY',
-  'FREE SHIPPING OVER 500 MAD',
-  'NEW ARRIVALS',
-  '30-DAY RETURNS',
-  'NEXSTIV ORIGINALS',
-  'CRAFTED WITH CARE',
-]
-
-function Marquee() {
+function Marquee({ text }: { text: string }) {
+  const TICKER_ITEMS = text.split(',').map(s => s.trim()).filter(Boolean)
   const items = [...TICKER_ITEMS, ...TICKER_ITEMS]
   return (
     <div className="overflow-hidden bg-neutral-950 text-white py-3 border-y border-neutral-800">
@@ -146,11 +137,13 @@ export default function Page() {
   const [collections, setCollections] = useState<{ id: string; name: string; description: string }[]>([])
   const [activeCollection, setActiveCollection] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [uiContent, setUiContent] = useState(DEFAULT_SETTINGS.uiContent)
   const { addToCart } = useCart()
 
   useEffect(() => {
     fetchProducts()
     fetchCollections()
+    loadSettings().then(s => setUiContent(s.uiContent))
   }, [])
 
   const fetchProducts = async () => {
@@ -227,19 +220,15 @@ export default function Page() {
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-20 pt-32">
           <p className="text-neutral-500 text-xs font-bold tracking-[0.3em] uppercase mb-6">
-            SS&apos;26 Collection
+            {uiContent.heroBadge}
           </p>
 
-          <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 max-w-3xl">
-            Wear the
-            <br />
-            <span className="text-transparent" style={{ WebkitTextStroke: '1.5px white' }}>
-              Difference.
-            </span>
+          <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 max-w-3xl whitespace-pre-line">
+            {uiContent.heroTitle}
           </h1>
 
-          <p className="text-neutral-400 text-base sm:text-lg max-w-md leading-relaxed mb-10">
-            Premium quality t-shirts engineered for those who refuse to blend in. Every stitch, intentional.
+          <p className="text-neutral-400 text-base sm:text-lg max-w-md leading-relaxed mb-10 whitespace-pre-line">
+            {uiContent.heroDescription}
           </p>
 
           <div className="flex items-center gap-4">
@@ -247,7 +236,7 @@ export default function Page() {
               href="#collection"
               className="inline-flex items-center gap-3 bg-white text-neutral-950 px-7 py-3.5 rounded-full font-bold text-sm hover:bg-neutral-200 transition-colors"
             >
-              Shop Collection
+              {uiContent.heroButtonText}
               <ArrowRight size={16} />
             </Link>
             <Link
@@ -264,18 +253,18 @@ export default function Page() {
       </section>
 
       {/* ── MARQUEE ── */}
-      <Marquee />
+      <Marquee text={uiContent.marqueeText} />
 
       {/* ── COLLECTION ── */}
       <section id="collection" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Section header */}
         <div className="flex items-end justify-between mb-8">
           <div>
-            <p className="text-neutral-400 text-xs font-bold tracking-[0.25em] uppercase mb-2">The Collection</p>
+            <p className="text-neutral-400 text-xs font-bold tracking-[0.25em] uppercase mb-2">{uiContent.collectionsSubtitle}</p>
             <h2 className="text-4xl md:text-5xl font-black tracking-tight">
               {activeCollection
-                ? (collections.find(c => c.id === activeCollection)?.name ?? 'Collection')
-                : 'Trending Now'}
+                ? (collections.find(c => c.id === activeCollection)?.name ?? uiContent.collectionsTitle)
+                : uiContent.collectionsTitle}
             </h2>
           </div>
         </div>
@@ -346,15 +335,11 @@ export default function Page() {
           aria-hidden
           className="absolute right-0 top-1/2 -translate-y-1/2 text-[18vw] font-black tracking-tighter text-white/[0.03] pointer-events-none select-none"
         >
-          QUALITY
+          {uiContent.featuresBgText}
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-          {[
-            { stat: '100%', label: 'Premium Cotton', sub: 'Sourced from trusted suppliers' },
-            { stat: '500+', label: 'Free Shipping', sub: 'On every qualifying order' },
-            { stat: '30', label: 'Day Returns', sub: 'No questions asked' },
-          ].map(({ stat, label, sub }) => (
-            <div key={label} className="space-y-2">
+          {uiContent.features.map(({ stat, label, sub }, i) => (
+            <div key={i} className="space-y-2">
               <div className="text-5xl font-black tracking-tight">{stat}</div>
               <div className="text-lg font-bold">{label}</div>
               <div className="text-neutral-500 text-sm">{sub}</div>
@@ -367,8 +352,8 @@ export default function Page() {
       <section id="collections" className="py-20 border-t border-neutral-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-12">
-            <p className="text-neutral-400 text-xs font-bold tracking-[0.25em] uppercase mb-2">Browse by Category</p>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight">Collections</h2>
+            <p className="text-neutral-400 text-xs font-bold tracking-[0.25em] uppercase mb-2">{uiContent.categoriesSubtitle}</p>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight">{uiContent.categoriesTitle}</h2>
           </div>
 
           {collections.length === 0 ? (

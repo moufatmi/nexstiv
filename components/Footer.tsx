@@ -1,7 +1,16 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
+import { loadSettings, DEFAULT_SETTINGS } from '@/lib/db'
+import { useState, useEffect } from 'react'
 
 export default function Footer() {
+  const [uiContent, setUiContent] = useState(DEFAULT_SETTINGS.uiContent)
+
+  useEffect(() => {
+    loadSettings().then(s => setUiContent(s.uiContent))
+  }, [])
   return (
     <footer className="bg-primary text-primary-foreground py-12 mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,68 +26,22 @@ export default function Footer() {
               />
               <h3 className="text-lg font-bold font-sans">NEXSTIV</h3>
             </div>
-            <p className="text-sm opacity-90 font-sans">Premium t-shirts for the modern lifestyle</p>
+            <p className="text-sm opacity-90 font-sans">{uiContent.footerDescription}</p>
           </div>
-          <div>
-            <h4 className="font-semibold mb-4 font-sans">Shop</h4>
-            <ul className="space-y-2 text-sm font-sans">
-              <li>
-                <Link href="/" className="hover:underline">
-                  All Products
-                </Link>
-              </li>
-              <li>
-                <Link href="/" className="hover:underline">
-                  New Arrivals
-                </Link>
-              </li>
-              <li>
-                <Link href="/" className="hover:underline">
-                  Best Sellers
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-4 font-sans">Company</h4>
-            <ul className="space-y-2 text-sm font-sans">
-              <li>
-                <Link href="#" className="hover:underline">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:underline">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:underline">
-                  Careers
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-4 font-sans">Support</h4>
-            <ul className="space-y-2 text-sm font-sans">
-              <li>
-                <Link href="#" className="hover:underline">
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:underline">
-                  Shipping
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:underline">
-                  Returns
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {uiContent.footerColumns?.map((col, idx) => (
+            <div key={idx}>
+              <h4 className="font-semibold mb-4 font-sans">{col.title}</h4>
+              <ul className="space-y-2 text-sm font-sans">
+                {col.links.map((link, linkIdx) => (
+                  <li key={linkIdx}>
+                    <Link href={link.url} className="hover:underline">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
         <div className="border-t border-primary-foreground/20 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-center sm:text-left">
           <p className="font-sans">&copy; {new Date().getFullYear()} NEXSTIV. All rights reserved.</p>

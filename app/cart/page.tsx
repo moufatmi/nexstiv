@@ -364,7 +364,7 @@ export default function CartPage() {
                     <span className="font-semibold">{shipping.toFixed(2)} MAD</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-neutral-500">Tax (10%)</span>
+                    <span className="text-neutral-500"></span>
                     <span className="font-semibold">{tax.toFixed(2)} MAD</span>
                   </div>
                 </div>
