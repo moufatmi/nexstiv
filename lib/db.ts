@@ -393,6 +393,7 @@ export interface StoreSettings {
   shippingFee: number      // flat fee in MAD
   freeShippingThreshold: number  // order value above which shipping is free
   promoCodes: { code: string; discount: number }[]  // discount in %
+  autoDiscounts: { name: string; minItems: number; discountValue: number; type: 'fixed' | 'percentage' }[]
 }
 
 const SETTINGS_KEY = 'nexstiv-settings'
@@ -402,6 +403,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   shippingFee: 15,
   freeShippingThreshold: 100,
   promoCodes: [{ code: 'SAVE10', discount: 10 }],
+  autoDiscounts: [],
 }
 
 export async function loadSettings(): Promise<StoreSettings> {
@@ -419,6 +421,7 @@ export async function loadSettings(): Promise<StoreSettings> {
           shippingFee: data.shipping_fee ?? DEFAULT_SETTINGS.shippingFee,
           freeShippingThreshold: data.free_shipping_threshold ?? DEFAULT_SETTINGS.freeShippingThreshold,
           promoCodes: data.promo_codes || DEFAULT_SETTINGS.promoCodes,
+          autoDiscounts: data.auto_discounts || DEFAULT_SETTINGS.autoDiscounts,
         }
       }
     } catch (e) {
@@ -446,6 +449,7 @@ export async function saveSettings(settings: StoreSettings): Promise<void> {
           shipping_fee: settings.shippingFee,
           free_shipping_threshold: settings.freeShippingThreshold,
           promo_codes: settings.promoCodes,
+          auto_discounts: settings.autoDiscounts,
           updated_at: new Date().toISOString()
         })
       if (error) console.error('Supabase settings save error:', error)

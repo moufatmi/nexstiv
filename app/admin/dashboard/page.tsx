@@ -61,6 +61,12 @@ export default function AdminDashboard() {
   const [newPromoCode, setNewPromoCode] = useState('')
   const [newPromoDiscount, setNewPromoDiscount] = useState('')
 
+  const [autoDiscounts, setAutoDiscounts] = useState(DEFAULT_SETTINGS.autoDiscounts)
+  const [newAutoName, setNewAutoName] = useState('')
+  const [newAutoMinItems, setNewAutoMinItems] = useState('')
+  const [newAutoValue, setNewAutoValue] = useState('')
+  const [newAutoType, setNewAutoType] = useState<'fixed'|'percentage'>('fixed')
+
   // Form State
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -112,6 +118,7 @@ export default function AdminDashboard() {
         setShippingFee(s.shippingFee)
         setFreeShippingThreshold(s.freeShippingThreshold)
         setPromoCodes(s.promoCodes)
+        setAutoDiscounts(s.autoDiscounts)
       })
 
       // Load theme
@@ -400,6 +407,7 @@ export default function AdminDashboard() {
       shippingFee,
       freeShippingThreshold,
       promoCodes,
+      autoDiscounts,
     }
     saveSettings(updated).then(() => {
       setSettings(updated)
@@ -420,6 +428,21 @@ export default function AdminDashboard() {
 
   const handleRemovePromoCode = (code: string) => {
     setPromoCodes(prev => prev.filter(p => p.code !== code))
+  }
+
+  const handleAddAutoDiscount = () => {
+    const name = newAutoName.trim()
+    const minItems = Number(newAutoMinItems)
+    const discountValue = Number(newAutoValue)
+    if (!name || isNaN(minItems) || minItems <= 0 || isNaN(discountValue) || discountValue <= 0) return
+    setAutoDiscounts(prev => [...prev, { name, minItems, discountValue, type: newAutoType }])
+    setNewAutoName('')
+    setNewAutoMinItems('')
+    setNewAutoValue('')
+  }
+
+  const handleRemoveAutoDiscount = (name: string) => {
+    setAutoDiscounts(prev => prev.filter(p => p.name !== name))
   }
 
   if (!authorized) {
@@ -812,6 +835,91 @@ export default function AdminDashboard() {
                         <button
                           type="button"
                           onClick={() => handleRemovePromoCode(code)}
+                          className="text-muted-foreground hover:text-red-500 transition-colors cursor-pointer"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Automatic Discounts */}
+              <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
+                <h2 className="text-base font-bold text-foreground">الخصومات التلقائية / Auto Discounts</h2>
+                <p className="text-muted-foreground/80 text-xs">يطبق الخصم تلقائيا في السلة عند تجاوز عدد القطع المطلوب.</p>
+
+                <div className="space-y-3 border border-border rounded-xl p-4 bg-background/50">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Name (e.g. Buy 2 Get 50 MAD off)</label>
+                      <input
+                        type="text"
+                        value={newAutoName}
+                        onChange={(e) => setNewAutoName(e.target.value)}
+                        placeholder="Discount Name"
+                        className="w-full px-4 py-2 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Minimum Items</label>
+                      <input
+                        type="number" min={1}
+                        value={newAutoMinItems}
+                        onChange={(e) => setNewAutoMinItems(e.target.value)}
+                        placeholder="2"
+                        className="w-full px-4 py-2 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 items-end">
+                    <div className="flex-1">
+                      <label className="text-xs text-muted-foreground mb-1 block">Discount Value</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="number" min={1}
+                          value={newAutoValue}
+                          onChange={(e) => setNewAutoValue(e.target.value)}
+                          placeholder="50"
+                          className="w-full px-4 py-2 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                        />
+                        <select 
+                          value={newAutoType}
+                          onChange={(e) => setNewAutoType(e.target.value as 'fixed' | 'percentage')}
+                          className="px-3 py-2 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                        >
+                          <option value="fixed">MAD</option>
+                          <option value="percentage">%</option>
+                        </select>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddAutoDiscount}
+                      className="px-4 py-2.5 h-[42px] bg-muted hover:bg-muted/80 text-foreground text-sm font-bold rounded-xl cursor-pointer transition-colors"
+                    >
+                      + Add Rule
+                    </button>
+                  </div>
+                </div>
+
+                {autoDiscounts.length === 0 ? (
+                  <p className="text-muted-foreground/60 text-sm text-center py-6">No auto discounts yet</p>
+                ) : (
+                  <div className="space-y-2">
+                    {autoDiscounts.map(({ name, minItems, discountValue, type }) => (
+                      <div key={name} className="flex items-center justify-between bg-background/60 border border-border rounded-xl px-4 py-3">
+                        <div>
+                          <p className="font-bold text-foreground text-sm">{name}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Buy ≥ {minItems} items : Get {discountValue}{type === 'percentage' ? '%' : ' MAD'} off
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAutoDiscount(name)}
                           className="text-muted-foreground hover:text-red-500 transition-colors cursor-pointer"
                         >
                           <Trash2 size={15} />

@@ -14,7 +14,7 @@ type Step = 'cart' | 'checkout' | 'success'
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, clearCart } = useCart()
   const [promoCode, setPromoCode] = useState('')
-  const [discount, setDiscount] = useState(0)
+  const [promoPercentage, setPromoPercentage] = useState(0)
   const [step, setStep] = useState<Step>('cart')
   const [placingOrder, setPlacingOrder] = useState(false)
   const [orderId, setOrderId] = useState('')
@@ -31,19 +31,40 @@ export default function CartPage() {
   const [city, setCity] = useState('')
   const [address, setAddress] = useState('')
 
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  // Calculate best auto discount
+  let autoDiscountValue = 0
+  let autoDiscountName = ''
+  if (storeSettings.autoDiscounts) {
+    for (const ad of storeSettings.autoDiscounts) {
+      if (totalItems >= ad.minItems) {
+        const value = ad.type === 'percentage' ? subtotal * (ad.discountValue / 100) : ad.discountValue
+        if (value > autoDiscountValue) {
+          autoDiscountValue = value
+          autoDiscountName = ad.name
+        }
+      }
+    }
+  }
+
+  const autoDiscountAmount = Math.min(autoDiscountValue, subtotal)
+  const promoDiscountAmount = (subtotal - autoDiscountAmount) * (promoPercentage / 100)
+  const totalDiscount = autoDiscountAmount + promoDiscountAmount
+
   const shipping = subtotal >= storeSettings.freeShippingThreshold || subtotal === 0 ? 0 : storeSettings.shippingFee
-  const tax = (subtotal - discount) * (storeSettings.taxRate / 100)
-  const total = subtotal - discount + tax + shipping
+  const tax = (subtotal - totalDiscount) * (storeSettings.taxRate / 100)
+  const total = subtotal - totalDiscount + tax + shipping
 
   const applyPromo = () => {
     const match = storeSettings.promoCodes.find(
       (p) => p.code === promoCode.toUpperCase().trim()
     )
     if (match) {
-      setDiscount(subtotal * (match.discount / 100))
+      setPromoPercentage(match.discount)
     } else {
-      setDiscount(0)
+      setPromoPercentage(0)
       alert('Invalid promo code')
     }
   }
@@ -60,7 +81,7 @@ export default function CartPage() {
         customer_address: address,
         items: cartItems,
         subtotal,
-        discount,
+        discount: totalDiscount,
         shipping,
         tax,
         total,
@@ -316,7 +337,7 @@ export default function CartPage() {
                         Apply
                       </button>
                     </div>
-                    {discount > 0 && <p className="text-xs text-green-600 font-semibold">✓ 10% discount applied</p>}
+                    {promoPercentage > 0 && <p className="text-xs text-green-600 font-semibold">✓ {promoPercentage}% discount applied</p>}
                   </div>
                 )}
 
@@ -326,10 +347,16 @@ export default function CartPage() {
                     <span className="text-neutral-500">Subtotal</span>
                     <span className="font-semibold">{subtotal.toFixed(2)} MAD</span>
                   </div>
-                  {discount > 0 && (
+                  {autoDiscountAmount > 0 && (
                     <div className="flex justify-between text-green-600">
-                      <span>Discount</span>
-                      <span>−{discount.toFixed(2)} MAD</span>
+                      <span>{autoDiscountName || 'Auto Discount'}</span>
+                      <span>−{autoDiscountAmount.toFixed(2)} MAD</span>
+                    </div>
+                  )}
+                  {promoDiscountAmount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Promo Discount</span>
+                      <span>−{promoDiscountAmount.toFixed(2)} MAD</span>
                     </div>
                   )}
                   <div className="flex justify-between">
