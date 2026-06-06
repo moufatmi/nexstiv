@@ -106,12 +106,13 @@ export default function AdminDashboard() {
       loadCollections()
       loadOrders()
       // Load store settings
-      const s = loadSettings()
-      setSettings(s)
-      setTaxRate(s.taxRate)
-      setShippingFee(s.shippingFee)
-      setFreeShippingThreshold(s.freeShippingThreshold)
-      setPromoCodes(s.promoCodes)
+      loadSettings().then(s => {
+        setSettings(s)
+        setTaxRate(s.taxRate)
+        setShippingFee(s.shippingFee)
+        setFreeShippingThreshold(s.freeShippingThreshold)
+        setPromoCodes(s.promoCodes)
+      })
 
       // Load theme
       const savedTheme = localStorage.getItem('nexstiv-admin-theme') as 'dark' | 'light' | null
@@ -400,10 +401,11 @@ export default function AdminDashboard() {
       freeShippingThreshold,
       promoCodes,
     }
-    saveSettings(updated)
-    setSettings(updated)
-    setSettingsSaved(true)
-    setTimeout(() => setSettingsSaved(false), 2500)
+    saveSettings(updated).then(() => {
+      setSettings(updated)
+      setSettingsSaved(true)
+      setTimeout(() => setSettingsSaved(false), 2500)
+    })
   }
 
   const handleAddPromoCode = () => {

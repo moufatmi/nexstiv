@@ -21,7 +21,7 @@ export default function CartPage() {
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(DEFAULT_SETTINGS)
 
   useEffect(() => {
-    setStoreSettings(loadSettings())
+    loadSettings().then(setStoreSettings)
   }, [])
 
   // Checkout form state

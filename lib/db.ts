@@ -404,7 +404,28 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   promoCodes: [{ code: 'SAVE10', discount: 10 }],
 }
 
-export function loadSettings(): StoreSettings {
+export async function loadSettings(): Promise<StoreSettings> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('store_settings')
+        .select('*')
+        .eq('id', 1)
+        .maybeSingle()
+      
+      if (!error && data) {
+        return {
+          taxRate: data.tax_rate ?? DEFAULT_SETTINGS.taxRate,
+          shippingFee: data.shipping_fee ?? DEFAULT_SETTINGS.shippingFee,
+          freeShippingThreshold: data.free_shipping_threshold ?? DEFAULT_SETTINGS.freeShippingThreshold,
+          promoCodes: data.promo_codes || DEFAULT_SETTINGS.promoCodes,
+        }
+      }
+    } catch (e) {
+      console.warn('Supabase settings fetch failed, using local fallback:', e)
+    }
+  }
+
   if (typeof window === 'undefined') return DEFAULT_SETTINGS
   try {
     const raw = localStorage.getItem(SETTINGS_KEY)
@@ -414,7 +435,25 @@ export function loadSettings(): StoreSettings {
   }
 }
 
-export function saveSettings(settings: StoreSettings): void {
+export async function saveSettings(settings: StoreSettings): Promise<void> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { error } = await supabase
+        .from('store_settings')
+        .upsert({
+          id: 1,
+          tax_rate: settings.taxRate,
+          shipping_fee: settings.shippingFee,
+          free_shipping_threshold: settings.freeShippingThreshold,
+          promo_codes: settings.promoCodes,
+          updated_at: new Date().toISOString()
+        })
+      if (error) console.error('Supabase settings save error:', error)
+    } catch (e) {
+      console.error('Supabase settings save failed:', e)
+    }
+  }
+
   if (typeof window !== 'undefined') {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
   }
