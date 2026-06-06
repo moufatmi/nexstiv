@@ -27,6 +27,8 @@ export default function CartPage() {
   // Checkout form state
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [city, setCity] = useState('')
   const [address, setAddress] = useState('')
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -53,6 +55,8 @@ export default function CartPage() {
       const order = await createOrder({
         customer_name: name,
         customer_email: email,
+        customer_phone: phone,
+        customer_city: city,
         customer_address: address,
         items: cartItems,
         subtotal,
@@ -229,6 +233,28 @@ export default function CartPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="your@email.com"
+                        className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Phone Number / رقم الهاتف</label>
+                      <input
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="06 XX XX XX XX"
+                        className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">City / المدينة</label>
+                      <input
+                        type="text"
+                        required
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder="Casablanca"
                         className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
                       />
                     </div>

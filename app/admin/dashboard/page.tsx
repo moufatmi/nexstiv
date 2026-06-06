@@ -1317,10 +1317,18 @@ export default function AdminDashboard() {
                   {/* Expanded details */}
                   {expandedOrder === order.id && (
                     <div className="border-t border-border p-5 space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                         <div>
                           <p className="text-muted-foreground/80 text-xs uppercase tracking-wider mb-1">Shipping Address</p>
                           <p className="text-foreground whitespace-pre-line">{order.customer_address}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground/80 text-xs uppercase tracking-wider mb-1">City</p>
+                          <p className="text-foreground">{order.customer_city}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground/80 text-xs uppercase tracking-wider mb-1">Phone</p>
+                          <p className="text-foreground">{order.customer_phone}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground/80 text-xs uppercase tracking-wider mb-1">Order Date</p>
