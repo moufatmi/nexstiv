@@ -414,6 +414,20 @@ export interface StoreSettings {
     categoriesTitle: string
     categoriesSubtitle: string
     footerColumns: { title: string; links: { label: string; url: string }[] }[]
+    storySubtitle: string
+    storyTitle: string
+    storyParagraph1: string
+    storyParagraph2: string
+    storyStats: { n: string; l: string }[]
+    storyFeatures: { title: string; body: string }[]
+    contactSubtitle: string
+    contactTitle: string
+    contactDescription: string
+    contactDetails: { label: string; value: string }[]
+    newsletterSubtitle: string
+    newsletterTitle: string
+    newsletterDescription: string
+    newsletterButtonText: string
   }
 }
 
@@ -468,6 +482,33 @@ export const DEFAULT_SETTINGS: StoreSettings = {
         ]
       }
     ],
+    storySubtitle: 'Our Story',
+    storyTitle: 'Built for those\nwho stand out.',
+    storyParagraph1: 'NEXSTIV was founded on a simple belief — that what you wear should say something about who you are without you having to say a word. We create premium t-shirts using responsibly sourced cotton, cut and sewn to last.',
+    storyParagraph2: 'Every piece is designed in-house, produced in small batches, and quality-checked by hand before it reaches you. No mass production. No shortcuts.',
+    storyStats: [
+      { n: '2021', l: 'Founded' },
+      { n: '12K+', l: 'Customers' },
+      { n: '100%', l: 'Cotton' },
+    ],
+    storyFeatures: [
+      { title: 'Ethical Production', body: 'Every garment is made in certified facilities with fair wages and safe conditions.' },
+      { title: 'Premium Materials', body: 'We use 180–220 GSM ring-spun cotton for softness that lasts wash after wash.' },
+      { title: 'Small Batches', body: 'Limited runs mean better quality control and less waste going to landfill.' },
+      { title: 'Free Returns', body: '30-day no-questions returns on all orders. Your satisfaction is guaranteed.' },
+    ],
+    contactSubtitle: 'Get in Touch',
+    contactTitle: 'We\'d love\nto hear from you.',
+    contactDescription: 'Have a question about sizing, an order, or just want to say hello? Fill out the form and we\'ll get back to you within 24 hours.',
+    contactDetails: [
+      { label: 'Email', value: 'hello@nexstiv.com' },
+      { label: 'Hours', value: 'Mon–Fri, 9am–6pm' },
+      { label: 'Response time', value: 'Within 24 hours' },
+    ],
+    newsletterSubtitle: 'Stay in the loop',
+    newsletterTitle: 'Get 10% Off',
+    newsletterDescription: 'Join the NEXSTIV community. Be the first to hear about new drops, restocks, and exclusive offers.',
+    newsletterButtonText: 'Subscribe',
   }
 }
 

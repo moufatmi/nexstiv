@@ -1168,6 +1168,212 @@ export default function AdminDashboard() {
                       </div>
                     ))}
                   </div>
+                  </div>
+                </div>
+
+                <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
+                  <h2 className="text-base font-bold text-foreground">قسم قصتنا / Our Story Section</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Story Subtitle</label>
+                      <input
+                        type="text"
+                        value={uiContent.storySubtitle}
+                        onChange={(e) => setUiContent({ ...uiContent, storySubtitle: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Story Title (Use \n for new line)</label>
+                      <textarea
+                        value={uiContent.storyTitle}
+                        onChange={(e) => setUiContent({ ...uiContent, storyTitle: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-20 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Story Paragraph 1</label>
+                      <textarea
+                        value={uiContent.storyParagraph1}
+                        onChange={(e) => setUiContent({ ...uiContent, storyParagraph1: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Story Paragraph 2</label>
+                      <textarea
+                        value={uiContent.storyParagraph2}
+                        onChange={(e) => setUiContent({ ...uiContent, storyParagraph2: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-xs font-bold text-foreground mb-2 block border-b border-border pb-2">Stats (3 items)</label>
+                      <div className="space-y-2">
+                        {uiContent.storyStats?.map((stat, idx) => (
+                          <div key={idx} className="flex gap-2">
+                            <input
+                              type="text"
+                              placeholder="Number (e.g. 2021)"
+                              value={stat.n}
+                              onChange={(e) => {
+                                const newStats = [...uiContent.storyStats]
+                                newStats[idx].n = e.target.value
+                                setUiContent({ ...uiContent, storyStats: newStats })
+                              }}
+                              className="w-1/3 px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Label (e.g. Founded)"
+                              value={stat.l}
+                              onChange={(e) => {
+                                const newStats = [...uiContent.storyStats]
+                                newStats[idx].l = e.target.value
+                                setUiContent({ ...uiContent, storyStats: newStats })
+                              }}
+                              className="w-2/3 px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-foreground mb-2 block border-b border-border pb-2 mt-4">Features (4 items)</label>
+                      <div className="space-y-3">
+                        {uiContent.storyFeatures?.map((feature, idx) => (
+                          <div key={idx} className="p-3 border border-border rounded-lg space-y-2 bg-background/50">
+                            <input
+                              type="text"
+                              placeholder="Feature Title"
+                              value={feature.title}
+                              onChange={(e) => {
+                                const newFeatures = [...uiContent.storyFeatures]
+                                newFeatures[idx].title = e.target.value
+                                setUiContent({ ...uiContent, storyFeatures: newFeatures })
+                              }}
+                              className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm font-bold"
+                            />
+                            <textarea
+                              placeholder="Feature Description"
+                              value={feature.body}
+                              onChange={(e) => {
+                                const newFeatures = [...uiContent.storyFeatures]
+                                newFeatures[idx].body = e.target.value
+                                setUiContent({ ...uiContent, storyFeatures: newFeatures })
+                              }}
+                              className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs h-16 resize-none"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
+                  <h2 className="text-base font-bold text-foreground">قسم التواصل / Contact Section</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Contact Subtitle</label>
+                      <input
+                        type="text"
+                        value={uiContent.contactSubtitle}
+                        onChange={(e) => setUiContent({ ...uiContent, contactSubtitle: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Contact Title (Use \n for new line)</label>
+                      <textarea
+                        value={uiContent.contactTitle}
+                        onChange={(e) => setUiContent({ ...uiContent, contactTitle: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-20 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Contact Description</label>
+                      <textarea
+                        value={uiContent.contactDescription}
+                        onChange={(e) => setUiContent({ ...uiContent, contactDescription: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-20 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-foreground mb-2 block border-b border-border pb-2 mt-4">Contact Details (3 items)</label>
+                      <div className="space-y-2">
+                        {uiContent.contactDetails?.map((detail, idx) => (
+                          <div key={idx} className="flex gap-2">
+                            <input
+                              type="text"
+                              placeholder="Label (e.g. Email)"
+                              value={detail.label}
+                              onChange={(e) => {
+                                const newDetails = [...uiContent.contactDetails]
+                                newDetails[idx].label = e.target.value
+                                setUiContent({ ...uiContent, contactDetails: newDetails })
+                              }}
+                              className="w-1/3 px-3 py-2 bg-background border border-border rounded-lg text-sm font-bold"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Value"
+                              value={detail.value}
+                              onChange={(e) => {
+                                const newDetails = [...uiContent.contactDetails]
+                                newDetails[idx].value = e.target.value
+                                setUiContent({ ...uiContent, contactDetails: newDetails })
+                              }}
+                              className="w-2/3 px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
+                  <h2 className="text-base font-bold text-foreground">النشرة البريدية / Newsletter Section</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Newsletter Subtitle</label>
+                      <input
+                        type="text"
+                        value={uiContent.newsletterSubtitle}
+                        onChange={(e) => setUiContent({ ...uiContent, newsletterSubtitle: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Newsletter Title</label>
+                      <input
+                        type="text"
+                        value={uiContent.newsletterTitle}
+                        onChange={(e) => setUiContent({ ...uiContent, newsletterTitle: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Newsletter Description</label>
+                      <textarea
+                        value={uiContent.newsletterDescription}
+                        onChange={(e) => setUiContent({ ...uiContent, newsletterDescription: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-20 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Button Text</label>
+                      <input
+                        type="text"
+                        value={uiContent.newsletterButtonText}
+                        onChange={(e) => setUiContent({ ...uiContent, newsletterButtonText: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

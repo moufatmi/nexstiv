@@ -397,25 +397,19 @@ export default function Page() {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
-            <p className="text-neutral-500 text-xs font-bold tracking-[0.25em] uppercase mb-4">Our Story</p>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-tight mb-6">
-              Built for those
-              <br />
-              who stand out.
+            <p className="text-neutral-500 text-xs font-bold tracking-[0.25em] uppercase mb-4">{uiContent.storySubtitle}</p>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-tight mb-6 whitespace-pre-line">
+              {uiContent.storyTitle}
             </h2>
             <p className="text-neutral-400 leading-relaxed mb-4">
-              NEXSTIV was founded on a simple belief — that what you wear should say something about who you are without you having to say a word. We create premium t-shirts using responsibly sourced cotton, cut and sewn to last.
+              {uiContent.storyParagraph1}
             </p>
             <p className="text-neutral-400 leading-relaxed mb-8">
-              Every piece is designed in-house, produced in small batches, and quality-checked by hand before it reaches you. No mass production. No shortcuts.
+              {uiContent.storyParagraph2}
             </p>
             <div className="grid grid-cols-3 gap-6 pt-8 border-t border-neutral-800">
-              {[
-                { n: '2021', l: 'Founded' },
-                { n: '12K+', l: 'Customers' },
-                { n: '100%', l: 'Cotton' },
-              ].map(({ n, l }) => (
-                <div key={l}>
+              {uiContent.storyStats?.map(({ n, l }, idx) => (
+                <div key={idx}>
                   <div className="text-3xl font-black tracking-tight">{n}</div>
                   <div className="text-neutral-500 text-sm mt-1">{l}</div>
                 </div>
@@ -423,13 +417,8 @@ export default function Page() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {[
-              { title: 'Ethical Production', body: 'Every garment is made in certified facilities with fair wages and safe conditions.' },
-              { title: 'Premium Materials', body: 'We use 180–220 GSM ring-spun cotton for softness that lasts wash after wash.' },
-              { title: 'Small Batches', body: 'Limited runs mean better quality control and less waste going to landfill.' },
-              { title: 'Free Returns', body: '30-day no-questions returns on all orders. Your satisfaction is guaranteed.' },
-            ].map(({ title, body }) => (
-              <div key={title} className="bg-neutral-900 rounded-2xl p-5 border border-neutral-800">
+            {uiContent.storyFeatures?.map(({ title, body }, idx) => (
+              <div key={idx} className="bg-neutral-900 rounded-2xl p-5 border border-neutral-800">
                 <div className="w-8 h-8 bg-white/10 rounded-lg mb-3 flex items-center justify-center">
                   <span className="text-white text-xs font-black">✦</span>
                 </div>
@@ -446,18 +435,14 @@ export default function Page() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16">
           {/* Left */}
           <div>
-            <p className="text-neutral-400 text-xs font-bold tracking-[0.25em] uppercase mb-4">Get in Touch</p>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6">We&apos;d love<br />to hear from you.</h2>
+            <p className="text-neutral-400 text-xs font-bold tracking-[0.25em] uppercase mb-4">{uiContent.contactSubtitle}</p>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6 whitespace-pre-line">{uiContent.contactTitle}</h2>
             <p className="text-neutral-500 leading-relaxed mb-10">
-              Have a question about sizing, an order, or just want to say hello? Fill out the form and we&apos;ll get back to you within 24 hours.
+              {uiContent.contactDescription}
             </p>
             <div className="space-y-5">
-              {[
-                { label: 'Email', value: 'hello@nexstiv.com' },
-                { label: 'Hours', value: 'Mon–Fri, 9am–6pm' },
-                { label: 'Response time', value: 'Within 24 hours' },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex items-center gap-4">
+              {uiContent.contactDetails?.map(({ label, value }, idx) => (
+                <div key={idx} className="flex items-center gap-4">
                   <span className="text-xs font-bold tracking-widest uppercase text-neutral-400 w-28">{label}</span>
                   <span className="text-sm font-semibold">{value}</span>
                 </div>
@@ -526,10 +511,10 @@ export default function Page() {
       {/* ── NEWSLETTER ── */}
       <section className="py-20 border-t border-neutral-100">
         <div className="max-w-xl mx-auto px-4 text-center">
-          <p className="text-neutral-400 text-xs font-bold tracking-[0.25em] uppercase mb-3">Stay in the loop</p>
-          <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3">Get 10% Off</h2>
+          <p className="text-neutral-400 text-xs font-bold tracking-[0.25em] uppercase mb-3">{uiContent.newsletterSubtitle}</p>
+          <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3">{uiContent.newsletterTitle}</h2>
           <p className="text-neutral-500 mb-8 text-sm leading-relaxed">
-            Join the NEXSTIV community. Be the first to hear about new drops, restocks, and exclusive offers.
+            {uiContent.newsletterDescription}
           </p>
           <div className="flex gap-2">
             <input
@@ -538,7 +523,7 @@ export default function Page() {
               className="flex-1 px-5 py-3 rounded-full border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
             />
             <button className="bg-neutral-950 text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-neutral-800 transition-colors cursor-pointer whitespace-nowrap">
-              Subscribe
+              {uiContent.newsletterButtonText}
             </button>
           </div>
         </div>
