@@ -23,6 +23,7 @@ import {
   saveSettings,
   StoreSettings,
   DEFAULT_SETTINGS,
+  supabase
 } from '@/lib/db'
 import { MockProduct, MockCollection, Order } from '@/lib/products-mock'
 
@@ -33,7 +34,7 @@ export default function AdminDashboard() {
   const [authorized, setAuthorized] = useState(false)
   const [products, setProducts] = useState<MockProduct[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'products' | 'collections' | 'orders' | 'settings' | 'content'>('products')
+  const [activeTab, setActiveTab] = useState<'products' | 'collections' | 'orders' | 'settings' | 'content' | 'messages'>('products')
   const router = useRouter()
 
   // Collections state
@@ -49,6 +50,10 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([])
   const [ordersLoading, setOrdersLoading] = useState(false)
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
+
+  // Messages state
+  const [messages, setMessages] = useState<any[]>([])
+  const [messagesLoading, setMessagesLoading] = useState(false)
 
   // Settings state
   const [settings, setSettings] = useState<StoreSettings>(DEFAULT_SETTINGS)
@@ -113,6 +118,7 @@ export default function AdminDashboard() {
       loadProducts()
       loadCollections()
       loadOrders()
+      loadMessages()
       // Load store settings
       loadSettings().then(s => {
         setSettings(s)
@@ -151,6 +157,37 @@ export default function AdminDashboard() {
     const data = await fetchAllOrders()
     setOrders(data)
     setOrdersLoading(false)
+  }
+
+  const loadMessages = async () => {
+    setMessagesLoading(true)
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false })
+      if (!error && data) {
+        setMessages(data)
+      }
+    }
+    setMessagesLoading(false)
+  }
+
+  const updateMessageStatus = async (id: string, status: string) => {
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.from('contact_messages').update({ status }).eq('id', id)
+      if (!error) {
+        setMessages(messages.map(m => m.id === id ? { ...m, status } : m))
+      }
+    }
+  }
+
+  const deleteMessage = async (id: string) => {
+    if (confirm('Are you sure you want to delete this message?')) {
+      if (isSupabaseConfigured && supabase) {
+        const { error } = await supabase.from('contact_messages').delete().eq('id', id)
+        if (!error) {
+          setMessages(messages.filter(m => m.id !== id))
+        }
+      }
+    }
   }
 
   const handleLogout = () => {
@@ -545,6 +582,19 @@ export default function AdminDashboard() {
             }`}
           >
             محتوى الموقع / UI Content
+          </button>
+          <button
+            onClick={() => setActiveTab('messages')}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+              activeTab === 'messages' ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            الرسائل / Messages
+            {messages.filter(m => m.status === 'unread').length > 0 && (
+              <span className="bg-blue-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                {messages.filter(m => m.status === 'unread').length}
+              </span>
+            )}
           </button>
         </div>
 
@@ -1432,6 +1482,72 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* ── MESSAGES TAB ── */}
+        {activeTab === 'messages' && (
+          <>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground tracking-tight">الرسائل / Messages</h1>
+                <p className="text-muted-foreground text-sm mt-1">عرض وإدارة الرسائل الواردة من نموذج اتصل بنا</p>
+              </div>
+            </div>
+
+            {messagesLoading ? (
+              <div className="py-20 text-center">
+                <div className="inline-block w-8 h-8 border-2 border-muted border-t-foreground rounded-full animate-spin"></div>
+                <p className="text-muted-foreground mt-4 font-medium text-sm">جاري تحميل الرسائل... / Loading messages...</p>
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="py-20 text-center border border-dashed border-border rounded-3xl bg-card/30">
+                <p className="text-muted-foreground font-medium">لا توجد رسائل حالياً / No messages found.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((msg) => (
+                  <div key={msg.id} className={`p-6 rounded-2xl border transition-colors ${msg.status === 'unread' ? 'bg-card border-blue-500/30 shadow-sm' : 'bg-muted/30 border-border opacity-70'}`}>
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+                      <div>
+                        <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+                          {msg.name}
+                          {msg.status === 'unread' && <span className="bg-blue-500 w-2 h-2 rounded-full inline-block"></span>}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-0.5">{msg.email}</p>
+                      </div>
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <span className="text-xs text-muted-foreground bg-background px-3 py-1 rounded-full border border-border">
+                          {new Date(msg.created_at).toLocaleString()}
+                        </span>
+                        {msg.status === 'unread' ? (
+                          <button
+                            onClick={() => updateMessageStatus(msg.id, 'read')}
+                            className="text-xs px-3 py-1 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 rounded-full font-medium transition-colors"
+                          >
+                            Mark as Read
+                          </button>
+                        ) : (
+                          <span className="text-xs px-3 py-1 bg-muted text-muted-foreground rounded-full font-medium">
+                            Read
+                          </span>
+                        )}
+                        <button
+                          onClick={() => deleteMessage(msg.id)}
+                          className="text-muted-foreground hover:text-red-400 transition-colors p-1"
+                          title="Delete message"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="bg-background/50 p-4 rounded-xl border border-border/50 text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                      {msg.message}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </main>
 

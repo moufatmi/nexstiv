@@ -7,7 +7,7 @@ import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { useCart } from '@/lib/cart-context'
-import { fetchAllProducts, fetchAllCollections, loadSettings, DEFAULT_SETTINGS } from '@/lib/db'
+import { fetchAllProducts, fetchAllCollections, loadSettings, DEFAULT_SETTINGS, supabase, isSupabaseConfigured } from '@/lib/db'
 
 interface Product {
   id: string
@@ -451,47 +451,58 @@ export default function Page() {
           </div>
 
           {/* Right — form */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              const form = e.currentTarget
-              const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement
-              if (btn) { btn.textContent = '✓ Message sent!'; btn.disabled = true }
-            }}
-            className="space-y-4"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Your name"
-                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Email</label>
-                <input
-                  type="email"
-                  required
-                  placeholder="your@email.com"
-                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Subject</label>
-              <input
-                type="text"
-                required
-                placeholder="Order issue, sizing question..."
-                className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
-              />
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault()
+                const form = e.currentTarget
+                const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement
+                const formData = new FormData(form)
+                const name = formData.get('name') as string
+                const email = formData.get('email') as string
+                const message = formData.get('message') as string
+
+                if (btn) { btn.textContent = 'Sending...'; btn.disabled = true }
+
+                if (isSupabaseConfigured && supabase) {
+                  const { error } = await supabase.from('contact_messages').insert([{ name, email, message }])
+                  if (error) {
+                    alert('Error sending message. Please try again later.')
+                    if (btn) { btn.textContent = 'Send Message'; btn.disabled = false }
+                    return
+                  }
+                }
+
+                if (btn) { btn.textContent = '✓ Message sent!'; }
+                form.reset()
+              }}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    placeholder="Your name"
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="your@email.com"
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
+                  />
+                </div>
             </div>
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Message</label>
               <textarea
+                name="message"
                 required
                 rows={5}
                 placeholder="Tell us how we can help..."
@@ -500,7 +511,7 @@ export default function Page() {
             </div>
             <button
               type="submit"
-              className="w-full bg-neutral-950 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-neutral-800 transition-colors cursor-pointer"
+              className="w-full py-4 bg-neutral-950 text-white rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-neutral-900 transition-colors disabled:opacity-50"
             >
               Send Message
             </button>
