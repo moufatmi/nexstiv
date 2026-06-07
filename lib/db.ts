@@ -288,7 +288,122 @@ export async function deleteCollection(id: string): Promise<boolean> {
   return false
 }
 
-// ─── Orders ─────────────────────────────────────────────────────────────────
+// ── PRODUCT REVIEWS ────────────────────────────────────────────────────────
+
+export interface ProductReview {
+  id: string
+  product_id: string
+  author_name: string
+  rating: number
+  comment: string
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
+}
+
+export async function fetchProductReviews(productId: string): Promise<ProductReview[]> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('product_reviews')
+        .select('*')
+        .eq('product_id', productId)
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false })
+      if (!error && data) {
+        return data as ProductReview[]
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  return []
+}
+
+export async function submitReview(review: Omit<ProductReview, 'id' | 'status' | 'created_at'>): Promise<boolean> {
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase.from('product_reviews').insert([review])
+    if (!error) return true
+  }
+  return false
+}
+
+export async function fetchAllReviewsAdmin(): Promise<ProductReview[]> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('product_reviews')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (!error && data) {
+        return data as ProductReview[]
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  return []
+}
+
+export async function updateReviewStatus(id: string, status: ProductReview['status']): Promise<boolean> {
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase.from('product_reviews').update({ status }).eq('id', id)
+    if (!error) return true
+  }
+  return false
+}
+
+export async function deleteReview(id: string): Promise<boolean> {
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase.from('product_reviews').delete().eq('id', id)
+    if (!error) return true
+  }
+  return false
+}
+
+// ── NEWSLETTER SUBSCRIBERS ────────────────────────────────────────────────
+
+export interface NewsletterSubscriber {
+  id: string
+  email: string
+  status: string
+  created_at: string
+}
+
+export async function submitNewsletter(email: string): Promise<boolean> {
+  if (isSupabaseConfigured && supabase) {
+    // Attempt to insert; if it fails (e.g., unique constraint), we can return false.
+    const { error } = await supabase.from('newsletter_subscribers').insert([{ email }])
+    if (!error) return true
+  }
+  return false
+}
+
+export async function fetchSubscribers(): Promise<NewsletterSubscriber[]> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('newsletter_subscribers')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (!error && data) {
+        return data as NewsletterSubscriber[]
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  return []
+}
+
+export async function deleteSubscriber(id: string): Promise<boolean> {
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase.from('newsletter_subscribers').delete().eq('id', id)
+    if (!error) return true
+  }
+  return false
+}
+
+// ── Orders ─────────────────────────────────────────────────────────────────
 
 const ORDERS_KEY = 'nexstiv-orders'
 

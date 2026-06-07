@@ -18,6 +18,7 @@ export default function DeveloperSignature() {
     // Keyboard shortcut easter egg: typing "dev" triggers it
     let keys = ''
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!e.key) return
       keys += e.key.toLowerCase()
       if (keys.endsWith('dev')) {
         setShowModal(true)

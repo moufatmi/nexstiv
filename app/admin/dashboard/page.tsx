@@ -23,7 +23,14 @@ import {
   saveSettings,
   StoreSettings,
   DEFAULT_SETTINGS,
-  supabase
+  supabase,
+  ProductReview,
+  fetchAllReviewsAdmin,
+  updateReviewStatus,
+  deleteReview,
+  NewsletterSubscriber,
+  fetchSubscribers,
+  deleteSubscriber
 } from '@/lib/db'
 import { MockProduct, MockCollection, Order } from '@/lib/products-mock'
 
@@ -34,7 +41,7 @@ export default function AdminDashboard() {
   const [authorized, setAuthorized] = useState(false)
   const [products, setProducts] = useState<MockProduct[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'products' | 'collections' | 'orders' | 'settings' | 'content' | 'messages'>('products')
+  const [activeTab, setActiveTab] = useState<'products' | 'collections' | 'orders' | 'settings' | 'content' | 'messages' | 'reviews' | 'subscribers'>('products')
   const router = useRouter()
 
   // Collections state
@@ -54,6 +61,14 @@ export default function AdminDashboard() {
   // Messages state
   const [messages, setMessages] = useState<any[]>([])
   const [messagesLoading, setMessagesLoading] = useState(false)
+
+  // Reviews state
+  const [adminReviews, setAdminReviews] = useState<ProductReview[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(false)
+
+  // Subscribers state
+  const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([])
+  const [subscribersLoading, setSubscribersLoading] = useState(false)
 
   // Settings state
   const [settings, setSettings] = useState<StoreSettings>(DEFAULT_SETTINGS)
@@ -142,6 +157,20 @@ export default function AdminDashboard() {
     setLoading(true)
     const data = await fetchAllProducts()
     setProducts(data)
+
+    // Load Reviews
+    if (isSupabaseConfigured) {
+      setReviewsLoading(true)
+      const allRev = await fetchAllReviewsAdmin()
+      setAdminReviews(allRev)
+      setReviewsLoading(false)
+
+      setSubscribersLoading(true)
+      const allSubs = await fetchSubscribers()
+      setSubscribers(allSubs)
+      setSubscribersLoading(false)
+    }
+
     setLoading(false)
   }
 
@@ -593,6 +622,32 @@ export default function AdminDashboard() {
             {messages.filter(m => m.status === 'unread').length > 0 && (
               <span className="bg-blue-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">
                 {messages.filter(m => m.status === 'unread').length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+              activeTab === 'reviews' ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            المراجعات / Reviews
+            {adminReviews.filter(r => r.status === 'pending').length > 0 && (
+              <span className="bg-orange-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                {adminReviews.filter(r => r.status === 'pending').length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('subscribers')}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+              activeTab === 'subscribers' ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            المشتركون / Subscribers
+            {subscribers.length > 0 && (
+              <span className="bg-foreground text-background text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                {subscribers.length}
               </span>
             )}
           </button>
@@ -1587,6 +1642,165 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ── Reviews Tab ── */}
+        {activeTab === 'reviews' && (
+          <>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-2xl font-black text-foreground tracking-tight">إدارة المراجعات / Customer Reviews</h1>
+                <p className="text-muted-foreground text-sm mt-1">Review, approve, or delete customer product reviews</p>
+              </div>
+            </div>
+
+            {reviewsLoading ? (
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                <div className="w-8 h-8 border-4 border-foreground border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p>Loading reviews...</p>
+              </div>
+            ) : adminReviews.length === 0 ? (
+              <div className="text-center py-20 bg-muted/30 rounded-2xl border border-border">
+                <p className="text-muted-foreground text-lg mb-2">No reviews found.</p>
+                <p className="text-sm opacity-70">Customer reviews will appear here.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {adminReviews.map((rev) => (
+                  <div key={rev.id} className={`p-6 rounded-2xl border transition-colors ${rev.status === 'pending' ? 'bg-card border-orange-500/30 shadow-sm' : rev.status === 'rejected' ? 'bg-red-500/5 border-red-500/20 opacity-70' : 'bg-muted/30 border-border opacity-70'}`}>
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+                      <div>
+                        <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+                          {rev.author_name}
+                          {rev.status === 'pending' && <span className="bg-orange-500 w-2 h-2 rounded-full inline-block"></span>}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-0.5">Product ID: {rev.product_id}</p>
+                      </div>
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <span className="flex text-accent text-sm mr-2">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className={i < rev.rating ? 'text-accent' : 'text-neutral-300'}>★</span>
+                          ))}
+                        </span>
+                        <span className="text-xs text-muted-foreground bg-background px-3 py-1 rounded-full border border-border">
+                          {new Date(rev.created_at).toLocaleString()}
+                        </span>
+                        {rev.status === 'pending' ? (
+                          <>
+                            <button
+                              onClick={async () => {
+                                await updateReviewStatus(rev.id, 'approved')
+                                setAdminReviews(adminReviews.map(r => r.id === rev.id ? { ...r, status: 'approved' } : r))
+                              }}
+                              className="text-xs px-3 py-1 bg-green-500/10 text-green-600 hover:bg-green-500/20 rounded-full font-medium transition-colors cursor-pointer"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={async () => {
+                                await updateReviewStatus(rev.id, 'rejected')
+                                setAdminReviews(adminReviews.map(r => r.id === rev.id ? { ...r, status: 'rejected' } : r))
+                              }}
+                              className="text-xs px-3 py-1 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-full font-medium transition-colors cursor-pointer"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        ) : rev.status === 'approved' ? (
+                          <span className="text-xs px-3 py-1 bg-green-500/10 text-green-600 rounded-full font-medium">Approved</span>
+                        ) : (
+                          <span className="text-xs px-3 py-1 bg-red-500/10 text-red-500 rounded-full font-medium">Rejected</span>
+                        )}
+                        <button
+                          onClick={async () => {
+                            if (confirm('Are you sure you want to delete this review?')) {
+                              await deleteReview(rev.id)
+                              setAdminReviews(adminReviews.filter(r => r.id !== rev.id))
+                            }
+                          }}
+                          className="text-muted-foreground hover:text-red-400 transition-colors p-1 cursor-pointer"
+                          title="Delete review"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="bg-background/50 p-4 rounded-xl border border-border/50 text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                      {rev.comment}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ── Subscribers Tab ── */}
+        {activeTab === 'subscribers' && (
+          <>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-2xl font-black text-foreground tracking-tight">قائمة المشتركين / Subscribers List</h1>
+                <p className="text-muted-foreground text-sm mt-1">Manage users who subscribed to your newsletter</p>
+              </div>
+            </div>
+
+            {subscribersLoading ? (
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                <div className="w-8 h-8 border-4 border-foreground border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p>Loading subscribers...</p>
+              </div>
+            ) : subscribers.length === 0 ? (
+              <div className="text-center py-20 bg-muted/30 rounded-2xl border border-border">
+                <p className="text-muted-foreground text-lg mb-2">No subscribers yet.</p>
+                <p className="text-sm opacity-70">Newsletter subscribers will appear here.</p>
+              </div>
+            ) : (
+              <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm whitespace-nowrap">
+                    <thead className="bg-muted/50 border-b border-border text-muted-foreground">
+                      <tr>
+                        <th className="px-6 py-4 font-bold">Email</th>
+                        <th className="px-6 py-4 font-bold">Status</th>
+                        <th className="px-6 py-4 font-bold">Subscribed At</th>
+                        <th className="px-6 py-4 font-bold text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {subscribers.map((sub) => (
+                        <tr key={sub.id} className="hover:bg-muted/30 transition-colors">
+                          <td className="px-6 py-4 font-medium text-foreground">{sub.email}</td>
+                          <td className="px-6 py-4">
+                            <span className="text-xs px-3 py-1 bg-green-500/10 text-green-600 rounded-full font-medium">
+                              {sub.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-muted-foreground">
+                            {new Date(sub.created_at).toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={async () => {
+                                if (confirm('Are you sure you want to remove this subscriber?')) {
+                                  await deleteSubscriber(sub.id)
+                                  setSubscribers(subscribers.filter(s => s.id !== sub.id))
+                                }
+                              }}
+                              className="text-muted-foreground hover:text-red-400 transition-colors p-2 cursor-pointer inline-flex"
+                              title="Delete subscriber"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </>

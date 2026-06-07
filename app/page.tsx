@@ -7,7 +7,7 @@ import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { useCart } from '@/lib/cart-context'
-import { fetchAllProducts, fetchAllCollections, loadSettings, DEFAULT_SETTINGS, supabase, isSupabaseConfigured } from '@/lib/db'
+import { fetchAllProducts, fetchAllCollections, loadSettings, DEFAULT_SETTINGS, supabase, isSupabaseConfigured, submitNewsletter } from '@/lib/db'
 
 interface Product {
   id: string
@@ -138,6 +138,10 @@ export default function Page() {
   const [activeCollection, setActiveCollection] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [uiContent, setUiContent] = useState(DEFAULT_SETTINGS.uiContent)
+  
+  // Newsletter state
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'submitting' | 'success'>('idle')
   const { addToCart } = useCart()
 
   useEffect(() => {
@@ -527,16 +531,44 @@ export default function Page() {
           <p className="text-neutral-500 mb-8 text-sm leading-relaxed">
             {uiContent.newsletterDescription}
           </p>
-          <div className="flex gap-2">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              className="flex-1 px-5 py-3 rounded-full border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
-            />
-            <button className="bg-neutral-950 text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-neutral-800 transition-colors cursor-pointer whitespace-nowrap">
-              {uiContent.newsletterButtonText}
-            </button>
-          </div>
+          {newsletterStatus === 'success' ? (
+            <div className="bg-green-500/10 text-green-600 p-4 rounded-xl text-sm font-medium border border-green-500/20 inline-block px-8">
+              Thank you for subscribing to our newsletter!
+            </div>
+          ) : (
+            <form 
+              onSubmit={async (e) => {
+                e.preventDefault()
+                if (!newsletterEmail) return
+                setNewsletterStatus('submitting')
+                const success = await submitNewsletter(newsletterEmail)
+                if (success) {
+                  setNewsletterStatus('success')
+                  setNewsletterEmail('')
+                } else {
+                  alert('Something went wrong. Please try again.')
+                  setNewsletterStatus('idle')
+                }
+              }}
+              className="flex gap-2"
+            >
+              <input
+                type="email"
+                required
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="flex-1 px-5 py-3 rounded-full border border-neutral-200 bg-neutral-50 focus:outline-none focus:border-neutral-950 text-sm transition-colors"
+              />
+              <button 
+                type="submit"
+                disabled={newsletterStatus === 'submitting'}
+                className="bg-neutral-950 text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-neutral-800 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
+              >
+                {newsletterStatus === 'submitting' ? 'Subscribing...' : uiContent.newsletterButtonText}
+              </button>
+            </form>
+          )}
         </div>
       </section>
 
