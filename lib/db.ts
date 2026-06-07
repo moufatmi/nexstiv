@@ -460,25 +460,25 @@ export const DEFAULT_SETTINGS: StoreSettings = {
       {
         title: 'Shop',
         links: [
-          { label: 'All Products', url: '/' },
-          { label: 'New Arrivals', url: '/' },
-          { label: 'Best Sellers', url: '/' },
+          { label: 'All Products', url: '/#collections' },
+          { label: 'New Arrivals', url: '/#collections' },
+          { label: 'Best Sellers', url: '/#collections' },
         ]
       },
       {
         title: 'Company',
         links: [
-          { label: 'About', url: '#' },
-          { label: 'Contact', url: '#' },
-          { label: 'Careers', url: '#' },
+          { label: 'About', url: '/about' },
+          { label: 'Contact', url: '/contact' },
+          { label: 'Careers', url: '/careers' },
         ]
       },
       {
         title: 'Support',
         links: [
-          { label: 'FAQ', url: '#' },
-          { label: 'Shipping', url: '#' },
-          { label: 'Returns', url: '#' },
+          { label: 'FAQ', url: '/faq' },
+          { label: 'Shipping', url: '/shipping' },
+          { label: 'Returns', url: '/returns' },
         ]
       }
     ],
