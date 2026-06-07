@@ -22,40 +22,20 @@ async function run() {
 
   let uiContent = data.ui_content || {}
   
-  // Apply new footer columns
-  uiContent.footerColumns = [
-    {
-      title: 'Shop',
-      links: [
-        { label: 'All Products', url: '/#collections' },
-        { label: 'New Arrivals', url: '/#collections' },
-        { label: 'Best Sellers', url: '/#collections' },
-      ]
-    },
-    {
-      title: 'Company',
-      links: [
-        { label: 'About', url: '/about' },
-        { label: 'Contact', url: '/contact' },
-        { label: 'Careers', url: '/careers' },
-      ]
-    },
-    {
-      title: 'Support',
-      links: [
-        { label: 'FAQ', url: '/faq' },
-        { label: 'Shipping', url: '/shipping' },
-        { label: 'Returns', url: '/returns' },
-      ]
-    }
-  ]
+  // Apply new page contents if they don't exist
+  if (!uiContent.pageAbout) uiContent.pageAbout = 'Learn more about our company, our mission, and our values.'
+  if (!uiContent.pageContact) uiContent.pageContact = 'Get in touch with our team for any inquiries or support.'
+  if (!uiContent.pageFAQ) uiContent.pageFAQ = 'Find answers to common questions about our products and services.'
+  if (!uiContent.pageShipping) uiContent.pageShipping = 'Information about our shipping rates, methods, and delivery times.'
+  if (!uiContent.pageReturns) uiContent.pageReturns = 'Our policy for returning or exchanging items you are not satisfied with.'
+  if (!uiContent.pageCareers) uiContent.pageCareers = 'Join our team! Explore open positions and opportunities.'
 
   const { error: updateError } = await supabase.from('store_settings').update({ ui_content: uiContent }).eq('id', 1)
   
   if (updateError) {
     console.log('Error updating:', updateError)
   } else {
-    console.log('Successfully updated footer links in Supabase DB.')
+    console.log('Successfully updated page contents in Supabase DB.')
   }
 }
 

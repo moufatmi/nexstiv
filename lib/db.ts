@@ -428,6 +428,12 @@ export interface StoreSettings {
     newsletterTitle: string
     newsletterDescription: string
     newsletterButtonText: string
+    pageAbout: string
+    pageContact: string
+    pageFAQ: string
+    pageShipping: string
+    pageReturns: string
+    pageCareers: string
   }
 }
 
@@ -509,6 +515,12 @@ export const DEFAULT_SETTINGS: StoreSettings = {
     newsletterTitle: 'Get 10% Off',
     newsletterDescription: 'Join the NEXSTIV community. Be the first to hear about new drops, restocks, and exclusive offers.',
     newsletterButtonText: 'Subscribe',
+    pageAbout: 'Learn more about our company, our mission, and our values.',
+    pageContact: 'Get in touch with our team for any inquiries or support.',
+    pageFAQ: 'Find answers to common questions about our products and services.',
+    pageShipping: 'Information about our shipping rates, methods, and delivery times.',
+    pageReturns: 'Our policy for returning or exchanging items you are not satisfied with.',
+    pageCareers: 'Join our team! Explore open positions and opportunities.',
   }
 }
 

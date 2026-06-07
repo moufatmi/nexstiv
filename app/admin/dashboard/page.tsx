@@ -1335,6 +1335,60 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
+                  <h2 className="text-base font-bold text-foreground">محتوى الصفحات / Pages Content</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">About Us Page Content</label>
+                      <textarea
+                        value={uiContent.pageAbout || ''}
+                        onChange={(e) => setUiContent({ ...uiContent, pageAbout: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Contact Page Content</label>
+                      <textarea
+                        value={uiContent.pageContact || ''}
+                        onChange={(e) => setUiContent({ ...uiContent, pageContact: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">FAQ Page Content</label>
+                      <textarea
+                        value={uiContent.pageFAQ || ''}
+                        onChange={(e) => setUiContent({ ...uiContent, pageFAQ: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Shipping Page Content</label>
+                      <textarea
+                        value={uiContent.pageShipping || ''}
+                        onChange={(e) => setUiContent({ ...uiContent, pageShipping: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Returns Page Content</label>
+                      <textarea
+                        value={uiContent.pageReturns || ''}
+                        onChange={(e) => setUiContent({ ...uiContent, pageReturns: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Careers Page Content</label>
+                      <textarea
+                        value={uiContent.pageCareers || ''}
+                        onChange={(e) => setUiContent({ ...uiContent, pageCareers: e.target.value })}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm h-24 resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
                   <h2 className="text-base font-bold text-foreground">النشرة البريدية / Newsletter Section</h2>
                   <div className="space-y-4">
                     <div>
