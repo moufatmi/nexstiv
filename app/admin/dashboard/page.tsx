@@ -1015,6 +1015,48 @@ export default function AdminDashboard() {
               </button>
             </div>
 
+            <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5 mb-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-base font-bold text-foreground">إعدادات الإطلاق / Drop Countdown</h2>
+                  <p className="text-muted-foreground text-xs mt-1">شريط علوي يظهر العد التنازلي لإطلاق مجموعة جديدة.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={uiContent.dropCountdownEnabled ?? false}
+                    onChange={(e) => setUiContent({ ...uiContent, dropCountdownEnabled: e.target.checked })}
+                  />
+                  <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-foreground"></div>
+                </label>
+              </div>
+              
+              {(uiContent.dropCountdownEnabled ?? false) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">عنوان الإطلاق / Drop Title</label>
+                    <input
+                      type="text"
+                      value={uiContent.dropCountdownTitle || ''}
+                      onChange={(e) => setUiContent({ ...uiContent, dropCountdownTitle: e.target.value })}
+                      placeholder="🔥 NEXT DROP: SUMMER ESSENTIALS"
+                      className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">تاريخ ووقت الإطلاق / Target Date & Time</label>
+                    <input
+                      type="datetime-local"
+                      value={uiContent.dropCountdownDate ? new Date(new Date(uiContent.dropCountdownDate).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                      onChange={(e) => setUiContent({ ...uiContent, dropCountdownDate: new Date(e.target.value).toISOString() })}
+                      className="w-full px-4 py-2.5 bg-background border border-border rounded-xl focus:border-neutral-500 focus:outline-none text-foreground text-sm"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Marquee & Hero */}
               <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">

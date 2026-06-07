@@ -5,13 +5,16 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ShoppingCart, Heart, Search, Menu, X } from 'lucide-react'
 import { useCart } from '@/lib/cart-context'
+import CountdownBanner from './CountdownBanner'
 
 export default function Navbar() {
   const { cartCount } = useCart()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-white text-foreground">
+    <div className="sticky top-0 z-50 flex flex-col w-full">
+      <CountdownBanner />
+      <nav className="border-b border-border bg-white text-foreground relative z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -105,5 +108,6 @@ export default function Navbar() {
         )}
       </div>
     </nav>
+    </div>
   )
 }

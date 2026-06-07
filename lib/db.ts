@@ -434,6 +434,9 @@ export interface StoreSettings {
     pageShipping: string
     pageReturns: string
     pageCareers: string
+    dropCountdownEnabled: boolean
+    dropCountdownTitle: string
+    dropCountdownDate: string
   }
 }
 
@@ -521,6 +524,9 @@ export const DEFAULT_SETTINGS: StoreSettings = {
     pageShipping: 'Information about our shipping rates, methods, and delivery times.',
     pageReturns: 'Our policy for returning or exchanging items you are not satisfied with.',
     pageCareers: 'Join our team! Explore open positions and opportunities.',
+    dropCountdownEnabled: true,
+    dropCountdownTitle: '🔥 NEXT DROP: SUMMER ESSENTIALS',
+    dropCountdownDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
   }
 }
 
