@@ -45,17 +45,7 @@ export default function Footer() {
         </div>
         <div className="border-t border-primary-foreground/20 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-center sm:text-left">
           <p className="font-sans">&copy; {new Date().getFullYear()} NEXSTIV. All rights reserved.</p>
-          <p className="text-xs opacity-75 font-mono">
-            Designed & Developed by{' '}
-            <a
-              href="https://github.com/moufatmi"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white hover:text-accent underline decoration-dotted transition-colors font-bold cursor-pointer"
-            >
-              Moussab Moufatmi
-            </a>
-          </p>
+
         </div>
       </div>
     </footer>

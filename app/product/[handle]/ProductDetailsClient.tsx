@@ -3,15 +3,16 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart, ShoppingCart, Share2, ArrowLeft } from 'lucide-react'
+import { Heart, ShoppingCart, Share2, ArrowLeft, Check } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import { fetchProductReviews, submitReview, ProductReview } from '@/lib/db'
+import { fetchProductReviews, submitReview, ProductReview, StoreSettings } from '@/lib/db'
 import { useCart } from '@/lib/cart-context'
 import { MockProduct } from '@/lib/products-mock'
 
 interface ProductDetailsClientProps {
   product: MockProduct
+  settings: StoreSettings
 }
 
 const getColorHex = (colorName: string) => {
@@ -58,12 +59,59 @@ const getColorHex = (colorName: string) => {
   }
 }
 
-export default function ProductDetailsClient({ product }: ProductDetailsClientProps) {
+export default function ProductDetailsClient({ product, settings }: ProductDetailsClientProps) {
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || '')
   const [selectedColor, setSelectedColor] = useState(product.colors[0] || '')
   const [quantity, setQuantity] = useState(1)
   const [isLiked, setIsLiked] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [shareCopied, setShareCopied] = useState(false)
+
+  // Initialize wishlist from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('nexstiv-wishlist')
+      if (saved) {
+        const wishlist = JSON.parse(saved)
+        setIsLiked(wishlist.includes(product.id))
+      }
+    }
+  }, [product.id])
+
+  const toggleWishlist = () => {
+    setIsLiked(prev => {
+      const next = !prev
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('nexstiv-wishlist')
+        let wishlist = saved ? JSON.parse(saved) : []
+        if (next) {
+          wishlist.push(product.id)
+        } else {
+          wishlist = wishlist.filter((id: string) => id !== product.id)
+        }
+        localStorage.setItem('nexstiv-wishlist', JSON.stringify(wishlist))
+      }
+      return next
+    })
+  }
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.title,
+          text: `Check out ${product.title} at NEXSTIV!`,
+          url: window.location.href,
+        })
+      } catch (err) {
+        console.error('Error sharing:', err)
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      setShareCopied(true)
+      setTimeout(() => setShareCopied(false), 2000)
+    }
+  }
 
   // Real Reviews state
   const [reviews, setReviews] = useState<ProductReview[]>([])
@@ -242,7 +290,7 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
                 Add to Cart
               </button>
               <button
-                onClick={() => setIsLiked(!isLiked)}
+                onClick={toggleWishlist}
                 className={`px-6 py-3 rounded-lg font-semibold transition-colors cursor-pointer ${
                   isLiked
                     ? 'bg-accent text-accent-foreground'
@@ -251,8 +299,16 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
               >
                 <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} />
               </button>
-              <button className="px-6 py-3 border border-border rounded-lg font-semibold hover:bg-secondary transition-colors cursor-pointer">
-                <Share2 size={20} />
+              <button 
+                onClick={handleShare}
+                className="px-6 py-3 border border-border rounded-lg font-semibold hover:bg-secondary transition-colors cursor-pointer relative"
+              >
+                {shareCopied ? <Check size={20} className="text-green-500" /> : <Share2 size={20} />}
+                {shareCopied && (
+                  <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs py-1 px-2 rounded whitespace-nowrap">
+                    Link Copied!
+                  </span>
+                )}
               </button>
             </div>
 
@@ -267,17 +323,18 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
               </p>
             </div>
 
-            {/* Shipping Info */}
+            {/* Shipping Info - Temporarily hidden 
             <div className="space-y-3 p-4 bg-secondary rounded-lg text-sm">
               <div className="flex gap-3">
                 <span className="font-semibold">Free Shipping</span>
-                <span className="text-muted-foreground">On orders over 500 MAD</span>
+                <span className="text-muted-foreground">On orders over {settings.freeShippingThreshold} MAD</span>
               </div>
               <div className="flex gap-3">
                 <span className="font-semibold">30-Day Returns</span>
                 <span className="text-muted-foreground">If you&apos;re not satisfied</span>
               </div>
             </div>
+            */}
           </div>
         </div>
       </section>
@@ -299,23 +356,16 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
 
           <div>
             <h2 className="text-2xl font-bold mb-4">Why Choose NEXSTIV?</h2>
-            <ul className="space-y-3 text-muted-foreground">
-              <li className="flex gap-3">
-                <span className="text-accent font-bold">✓</span>
-                <span>Premium quality cotton sourced from trusted suppliers</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-accent font-bold">✓</span>
-                <span>Ethically manufactured with attention to detail</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-accent font-bold">✓</span>
-                <span>Comfortable fit designed for all-day wear</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-accent font-bold">✓</span>
-                <span>Sustainable packaging and eco-friendly practices</span>
-              </li>
+            <ul className="space-y-4 text-muted-foreground">
+              {settings.uiContent.storyFeatures.map((feature, idx) => (
+                <li key={idx} className="flex gap-3">
+                  <span className="text-accent font-bold">✓</span>
+                  <div>
+                    <span className="font-semibold block text-foreground">{feature.title}</span>
+                    <span className="text-sm">{feature.body}</span>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

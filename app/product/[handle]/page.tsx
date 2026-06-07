@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { fetchProductByHandle } from '@/lib/db'
+import { fetchProductByHandle, loadSettings } from '@/lib/db'
 import ProductDetailsClient from './ProductDetailsClient'
 
 interface Props {
@@ -55,6 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Props) {
   const unwrappedParams = await params
   const product = await fetchProductByHandle(unwrappedParams.handle)
+  const settings = await loadSettings()
 
   if (!product) {
     return (
@@ -67,7 +68,7 @@ export default async function ProductPage({ params }: Props) {
     )
   }
 
-  return <ProductDetailsClient product={product} />
+  return <ProductDetailsClient product={product} settings={settings} />
 }
 
 
