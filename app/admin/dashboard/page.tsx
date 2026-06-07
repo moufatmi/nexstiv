@@ -1168,7 +1168,6 @@ export default function AdminDashboard() {
                       </div>
                     ))}
                   </div>
-                  </div>
                 </div>
 
                 <div className="bg-card/40 border border-border rounded-2xl p-6 space-y-5">
@@ -1375,6 +1374,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
