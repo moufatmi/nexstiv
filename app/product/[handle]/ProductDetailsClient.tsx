@@ -127,7 +127,7 @@ export default function ProductDetailsClient({ product, settings }: ProductDetai
     fetchProductReviews(product.id).then(setReviews)
   }, [product.id])
 
-  const averageRating = reviews.length > 0 
+  const averageRating = reviews.length > 0
     ? Number((reviews.reduce((acc, rev) => acc + rev.rating, 0) / reviews.length).toFixed(1))
     : product.rating
   const reviewsCount = reviews.length > 0 ? reviews.length : product.reviews
@@ -186,9 +186,8 @@ export default function ProductDetailsClient({ product, settings }: ProductDetai
                 <div
                   key={idx}
                   onClick={() => setActiveImageIndex(idx)}
-                  className={`relative aspect-square bg-secondary rounded-lg overflow-hidden cursor-pointer transition-all border-2 ${
-                    activeImageIndex === idx ? 'border-primary' : 'border-transparent hover:opacity-80'
-                  }`}
+                  className={`relative aspect-square bg-secondary rounded-lg overflow-hidden cursor-pointer transition-all border-2 ${activeImageIndex === idx ? 'border-primary' : 'border-transparent hover:opacity-80'
+                    }`}
                 >
                   <Image src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
                 </div>
@@ -226,11 +225,10 @@ export default function ProductDetailsClient({ product, settings }: ProductDetai
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`py-2 px-3 border-2 rounded-lg font-medium transition-colors cursor-pointer ${
-                      selectedSize === size
+                    className={`py-2 px-3 border-2 rounded-lg font-medium transition-colors cursor-pointer ${selectedSize === size
                         ? 'border-primary bg-primary text-primary-foreground'
                         : 'border-border hover:border-primary'
-                    }`}
+                      }`}
                   >
                     {size}
                   </button>
@@ -247,11 +245,10 @@ export default function ProductDetailsClient({ product, settings }: ProductDetai
                     key={color}
                     onClick={() => setSelectedColor(color)}
                     style={{ backgroundColor: getColorHex(color) }}
-                    className={`w-10 h-10 rounded-full border-2 transition-all cursor-pointer ${
-                      selectedColor === color
+                    className={`w-10 h-10 rounded-full border-2 transition-all cursor-pointer ${selectedColor === color
                         ? 'border-primary scale-110 shadow-md ring-2 ring-primary/20'
                         : 'border-border hover:scale-105'
-                    }`}
+                      }`}
                     title={color}
                   />
                 ))}
@@ -291,15 +288,14 @@ export default function ProductDetailsClient({ product, settings }: ProductDetai
               </button>
               <button
                 onClick={toggleWishlist}
-                className={`px-6 py-3 rounded-lg font-semibold transition-colors cursor-pointer ${
-                  isLiked
+                className={`px-6 py-3 rounded-lg font-semibold transition-colors cursor-pointer ${isLiked
                     ? 'bg-accent text-accent-foreground'
                     : 'bg-secondary text-foreground hover:bg-muted'
-                }`}
+                  }`}
               >
                 <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} />
               </button>
-              <button 
+              <button
                 onClick={handleShare}
                 className="px-6 py-3 border border-border rounded-lg font-semibold hover:bg-secondary transition-colors cursor-pointer relative"
               >
@@ -316,7 +312,7 @@ export default function ProductDetailsClient({ product, settings }: ProductDetai
             <div className="p-4 bg-secondary rounded-lg">
               <p className="font-semibold text-sm">
                 {product.inStock ? (
-                  <span className="text-green-600">✓ In Stock - Ships within 2-3 business days</span>
+                  <span className="text-green-600">✓ In Stock</span>
                 ) : (
                   <span className="text-red-600">Out of Stock</span>
                 )}
@@ -411,7 +407,7 @@ export default function ProductDetailsClient({ product, settings }: ProductDetai
                   Thank you for your review! It has been submitted and is pending approval.
                 </div>
               ) : (
-                <form 
+                <form
                   onSubmit={async (e) => {
                     e.preventDefault()
                     setSubmittingReview(true)
@@ -437,8 +433,8 @@ export default function ProductDetailsClient({ product, settings }: ProductDetai
                     <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Rating</label>
                     <div className="flex text-2xl cursor-pointer">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <span 
-                          key={star} 
+                        <span
+                          key={star}
                           onClick={() => setReviewRating(star)}
                           className={star <= reviewRating ? 'text-accent' : 'text-neutral-300'}
                         >
