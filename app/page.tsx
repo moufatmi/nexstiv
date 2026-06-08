@@ -7,7 +7,7 @@ import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { useCart } from '@/lib/cart-context'
-import { fetchAllProducts, fetchAllCollections, loadSettings, DEFAULT_SETTINGS, supabase, isSupabaseConfigured, submitNewsletter } from '@/lib/db'
+import { fetchAllProducts, fetchAllCollections, loadSettings, DEFAULT_SETTINGS, supabase, isSupabaseConfigured, submitNewsletter, fetchProductReviews } from '@/lib/db'
 
 interface Product {
   id: string
@@ -49,6 +49,18 @@ function ProductCard({ product, onAddToCart }: {
   onAddToCart: (product: Product) => void
 }) {
   const cardRef = useRef<HTMLDivElement>(null)
+  const [rating, setRating] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetchProductReviews(product.id).then((reviews) => {
+      if (reviews.length > 0) {
+        const avg = reviews.reduce((acc, rev) => acc + rev.rating, 0) / reviews.length
+        setRating(Number(avg.toFixed(1)))
+      } else {
+        setRating(product.rating)
+      }
+    })
+  }, [product.id, product.rating])
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current
@@ -107,7 +119,9 @@ function ProductCard({ product, onAddToCart }: {
             </span>
             <div className="flex items-center gap-1">
               <Star size={13} className="fill-amber-400 text-amber-400" />
-              <span className="text-xs text-neutral-400 font-medium">4.8</span>
+              <span className="text-xs text-neutral-400 font-medium">
+                {rating !== null ? rating : product.rating}
+              </span>
             </div>
           </div>
         </div>
