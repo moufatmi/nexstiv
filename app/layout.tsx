@@ -43,10 +43,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || '2117621795634817'
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} bg-background`} suppressHydrationWarning>
       <head>
-        {process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID && (
+        {PIXEL_ID && (
           <Script
             id="fb-pixel"
             strategy="afterInteractive"
@@ -60,7 +62,7 @@ export default function RootLayout({
                 t.src=v;s=b.getElementsByTagName(e)[0];
                 s.parentNode.insertBefore(t,s)}(window, document,'script',
                 'https://connect.facebook.net/en_US/fbevents.js');
-                fbq('init', '${process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID}');
+                fbq('init', '${PIXEL_ID}');
                 fbq('track', 'PageView');
               `,
             }}
